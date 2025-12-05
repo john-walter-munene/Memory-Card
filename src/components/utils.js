@@ -4,7 +4,7 @@ function adaptGIFsToLightWeight(arrayOfGIFs) {
         return {
             id: gif.id,
             url: gif.images.original.url,
-            caption: gif.title,
+            caption: getCreatorName(gif.title),
             clicked: false,
         };
     });
@@ -26,6 +26,25 @@ function shuffleArray(array) {
 
     return array;
 }
+
+// Ensure that the set of displayed cards contains an unclicked card.
+function shuffleUntilUnclicked(cards, displayCount) {
+
+    // End game at max points as user would be forced to click a clicked card, and game resets.
+    if (cards.every(card => (card.clicked))) return cards;
+
+    // Shuffle till next visible part has a card that can be clicked!
+    let shuffled;
+    let hasUnclicked;
+
+    do {
+        shuffled = shuffleArray(cards);
+        hasUnclicked = shuffled.slice(0, displayCount).some(card => !card.clicked);
+    } while (!hasUnclicked);
+    
+    return shuffled;
+}
+
 
 // Get creator names for caption/photo alt texts.
 function getCreatorName(caption) {
@@ -79,7 +98,7 @@ function normalizeName(name) {
 }
 
 
-// NEW: Always enforce exactly two words
+// Always enforce exactly two words
 function enforceTwoWords(name) {
     const words = name.split(/\s+/);
 
@@ -89,4 +108,4 @@ function enforceTwoWords(name) {
     return words.slice(0, 2).join(" ");
 }
 
-export { adaptGIFsToLightWeight, shuffleArray, getCreatorName };
+export { adaptGIFsToLightWeight, shuffleArray, shuffleUntilUnclicked };

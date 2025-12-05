@@ -1,36 +1,56 @@
-import { shuffleArray, getCreatorName } from "./utils";
+// GameBoard.jsx
+import { shuffleUntilUnclicked } from "./utils";
 
-// Individual Card item.
-function SoccerCard({ cardObject }) {
-    const creatorName = getCreatorName(cardObject.caption);
+// Card Component.
+function SoccerCard({ cardObject, onClick }) {
+    const creatorName = cardObject.caption;
 
     return (
-        <div className="card">
+        <div className="card" onClick={onClick}>
             <img src={cardObject.url} alt={`Photo by ${creatorName}`} />
             <p>{creatorName}</p>
         </div>
     );
 }
 
-function SoccerGameBoard({ soccerGIFs }) {
+// Game Board Component
+function SoccerGameBoard({ soccerGIFs, scores, onSoccerPhotoCardsChange, onScoresChange, onRestartGame }) {
     if (!soccerGIFs || soccerGIFs.length === 0) return null;
 
-    
-    // Purely rendering logic.
-    const uniqueGIFsMap = new Map();
-    soccerGIFs.forEach(gif => {
-        if (!uniqueGIFsMap.has(gif.id)) uniqueGIFsMap.set(gif.id, gif);
-    });
+    // Handle Game flow by clicking a card.
+    const handleCardClick = (cardId) => {
+        // Get card to work with on click.
+        const copyOfSoccerGIFs = [...soccerGIFs];
+        const index = copyOfSoccerGIFs.findIndex(card => card.id === cardId);
+        const card = copyOfSoccerGIFs[index];
 
-    const uniqueGIFs = Array.from(uniqueGIFsMap.values());
-    const shuffled = shuffleArray(uniqueGIFs.slice());
-    const selectedGIFs = shuffled.slice(0, 12);
+        // If Card is clicked already, restart game.
+        if (card.clicked) {
+            const { currentScore, bestScore } = scores;
+            onScoresChange({ bestScore: Math.max(currentScore, bestScore), currentScore: 0 });
+            onRestartGame();
+            return;
+        }
+
+        // Update clicked card in copy of cards
+        // Shuffle cards to ensure next slot of cards has at leas one unlciked card.
+        // Set a ready to be rendered set of cards.
+        copyOfSoccerGIFs[index] = { ...card, clicked: true };
+        onSoccerPhotoCardsChange(shuffleUntilUnclicked(copyOfSoccerGIFs, 12));
+
+        // Update scores.
+        onScoresChange(prev => ({ ...prev, currentScore: scores.currentScore + 1 }));
+    };
+
+    const selectedGIFs = soccerGIFs.slice(0, 12);
 
     return (
         <div className="soccer-board">
-            {selectedGIFs.map(card => (<SoccerCard key={card.id} cardObject={card} />))}
+            {selectedGIFs.map(card => (
+                <SoccerCard key={card.id} cardObject={card} onClick={() => handleCardClick(card.id)} />
+            ))}
         </div>
     );
 }
 
-export { SoccerGameBoard };
+export { SoccerGameBoard }

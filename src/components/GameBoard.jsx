@@ -1,7 +1,7 @@
-// GameBoard.jsx
+// Import shuffle functionality.
 import { shuffleUntilUnclicked } from "./utils";
 
-// Card Component.
+// Individual soccer card item component.
 function SoccerCard({ cardObject, onClick }) {
     const creatorName = cardObject.caption;
 

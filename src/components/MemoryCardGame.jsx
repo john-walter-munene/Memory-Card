@@ -8,7 +8,6 @@ import { SoccerGameBoard } from "./GameBoard";
 function SoccerMemoryCardGameHouse() {
     const [soccerPhotoCards, setSoccerPhotoCards] = useState([]);
     const [scores, setScores] = useState({ currentScore: 0, bestScore: 0 });
-    const [restartFlag, setRestartFlag] = useState(false);
 
     // Fetch cards on load
     useEffect(() => {
@@ -40,14 +39,13 @@ function SoccerMemoryCardGameHouse() {
         setSoccerPhotoCards((prev) =>
         shuffleArray(prev.map((card) => ({ ...card, clicked: false }))));
         setScores((prev) => ({ ...prev, currentScore: 0 }));
-        setRestartFlag(false);
     };
 
     return (
         <div className="soccer-memory-house">
             <GameHeader scores={scores} />
-            <SoccerGameBoard soccerGIFs={soccerPhotoCards} scores={scores} restartFlag={restartFlag}
-                onSoccerPhotoCardsChange={setSoccerPhotoCards} onScoresChange={setScores} onRestartGame={handleRestart} />
+            <SoccerGameBoard soccerGIFs={soccerPhotoCards} scores={scores} onSoccerPhotoCardsChange={setSoccerPhotoCards}
+                onScoresChange={setScores} onRestartGame={handleRestart} />
         </div>
     );
 }
